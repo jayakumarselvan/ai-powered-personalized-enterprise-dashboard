@@ -26,19 +26,19 @@ async def generate_recommendations(employee_id: str) -> RecommendationsResponse:
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.4,
-        max_tokens=512,
+        max_tokens=1200,
     )
 
     data: list[dict] = extract_json(raw)  # type: ignore[assignment]
 
     recommendations = [
         Recommendation(
-            id=item.get("id", f"rec_{i}"),
+            id=item.get("id", f"rec_{i + 1}"),
             category=item.get("category", "productivity"),
             title=item["title"],
             description=item["description"],
             action_label=item.get("action_label", "View"),
-            priority=item.get("priority", i + 1),
+            priority=i + 1,  # enforce sequential priority regardless of LLM output
         )
         for i, item in enumerate(data)
     ]

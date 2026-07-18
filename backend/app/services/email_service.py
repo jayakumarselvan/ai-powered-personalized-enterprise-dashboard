@@ -30,7 +30,7 @@ async def generate_email(
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.6,
-        max_tokens=500,
+        max_tokens=700,
     )
 
     data: dict = extract_json(raw)  # type: ignore[assignment]

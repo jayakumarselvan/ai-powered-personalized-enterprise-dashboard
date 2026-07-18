@@ -26,7 +26,7 @@ async def generate_summary(employee_id: str) -> SummaryResponse:
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.5,
-        max_tokens=400,
+        max_tokens=600,
     )
 
     data: dict = extract_json(raw)  # type: ignore[assignment]

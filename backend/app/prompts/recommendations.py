@@ -6,9 +6,12 @@ System and user prompt templates for AI recommendations.
 from typing import Any
 
 
-SYSTEM_PROMPT = """You are an enterprise AI assistant. Analyze the employee data and return ONLY a JSON array of exactly 5 recommendations. No prose, no markdown.
-
-Schema per item: {"id":"rec_N","category":"urgent|productivity|risk|learning|team","title":"<10 words","description":"<20 words","action_label":"<4 words","priority":N}"""
+SYSTEM_PROMPT = (
+    'Return ONLY a raw JSON array — no prose, no markdown, no explanation. '
+    'Exactly 5 items. Schema: '
+    '[{"id":"rec_1","category":"urgent|productivity|risk|learning|team",'
+    '"title":"short title","description":"one sentence","action_label":"2-3 words","priority":1}, ...]'
+)
 
 
 def build_user_prompt(employee: dict[str, Any]) -> str:

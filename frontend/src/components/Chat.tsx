@@ -4,6 +4,7 @@
 import { type FC, useState, useRef, useEffect } from 'react'
 import { RiRobot2Line, RiSendPlane2Line, RiUser3Line } from 'react-icons/ri'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import type { ChatMessage } from '../types'
 
 const SUGGESTED_QUESTIONS = [
@@ -115,6 +116,7 @@ const Chat: FC<Props> = ({ employeeName, loading, onSend }) => {
             >
               {msg.role === 'user' ? msg.content : (
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                     strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
@@ -130,6 +132,26 @@ const Chat: FC<Props> = ({ employeeName, loading, onSend }) => {
                     blockquote: ({ children }) => <blockquote className="border-l-2 border-indigo-500 pl-3 my-2 text-gray-400 italic">{children}</blockquote>,
                     a: ({ href, children }) => <a href={href} className="text-indigo-400 underline hover:text-indigo-300" target="_blank" rel="noopener noreferrer">{children}</a>,
                     hr: () => <hr className="border-dark-500 my-3" />,
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto my-3">
+                        <table className="w-full text-xs border-collapse">{children}</table>
+                      </div>
+                    ),
+                    thead: ({ children }) => <thead>{children}</thead>,
+                    tbody: ({ children }) => <tbody>{children}</tbody>,
+                    tr: ({ children }) => (
+                      <tr className="border-b border-dark-500 last:border-0">{children}</tr>
+                    ),
+                    th: ({ children }) => (
+                      <th className="text-left px-3 py-2 text-indigo-300 font-semibold bg-dark-800 first:rounded-tl-lg last:rounded-tr-lg whitespace-nowrap">
+                        {children}
+                      </th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="px-3 py-2 text-gray-300 align-top border-r border-dark-600 last:border-0">
+                        {children}
+                      </td>
+                    ),
                   }}
                 >
                   {msg.content}

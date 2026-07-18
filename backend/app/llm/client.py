@@ -6,12 +6,14 @@ All provider selection is driven purely from environment variables.
 
 from __future__ import annotations
 
+import logging
 import os
-from typing import Any, AsyncIterator
+from typing import AsyncIterator
 
 import litellm
 from litellm import acompletion
 
+logger = logging.getLogger(__name__)
 
 # Enable LiteLLM debug logging via env var (set_verbose is deprecated)
 if os.getenv("APP_ENV", "production") == "development":
@@ -32,7 +34,7 @@ class LLMClient:
         self,
         model: str | None = None,
         temperature: float = 0.7,
-        max_tokens: int = 512,
+        max_tokens: int = 1024,
     ) -> None:
         self.model = model or os.getenv("MODEL", "gpt-4o-mini")
         self.temperature = temperature
@@ -55,7 +57,21 @@ class LLMClient:
                 temperature=temperature if temperature is not None else self.temperature,
                 max_tokens=max_tokens if max_tokens is not None else self.max_tokens,
             )
-            return response.choices[0].message.content or ""
+            content = response.choices[0].message.content
+
+            # Guard against empty/None response (content filter, truncation, etc.)
+            if not content or not content.strip():
+                finish_reason = response.choices[0].finish_reason
+                raise RuntimeError(
+                    f"LLM returned empty content [{self.model}]. "
+                    f"finish_reason={finish_reason!r}. "
+                    "Possible causes: content filter triggered, max_tokens too low, "
+                    "or model refused the request."
+                )
+
+            return content.strip()
+        except RuntimeError:
+            raise
         except Exception as exc:
             raise RuntimeError(f"LLM call failed [{self.model}]: {exc}") from exc
 
